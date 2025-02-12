@@ -37,45 +37,39 @@ _sta=`lssam|grep $_src|grep -v grep |awk  '{print $2}'|sed -e 's/ //g'|sort -u`
 _num=`lssam|grep $_src|grep -v grep |awk  '{print $2}'|sed -e 's/ //g'|sort -u|wc -l`
 
 # start db
-startDb()
-{
+startDb() {
 	if [ "x$_rol"="x" ]
 	then
 		echo "startup stardard db on "$_hos"
-		#su - db2inst1 -c "db2start"
+		# su - db2inst1 -c "db2start"
 	fi
 }
 
 # stop db
-stopDb()
-{
+stopDb() {
 	if [ "$_rol"="${_ros[0]}"]
 	then
 		echo "shutdown stardard db on "$_hos"
-		#su - db2inst1 -c "db2stop"
+		# su - db2inst1 -c "db2stop"
 	fi
-
 }
 
 # startup hadr on standby host
-strStandby()
-{
+strStandby() {
 	echo "startup standy db on "$_hos"
-	#su - db2inst1 -c "db2 deactivate database $_dbname"
-	#su - db2inst1 -c "db2 start hadr on database $_dbname as standby"
+	# su - db2inst1 -c "db2 deactivate database $_dbname"
+	# su - db2inst1 -c "db2 start hadr on database $_dbname as standby"
 }
 
 # start primary
-strPrimary()
-{
+strPrimary() {
 	echo "startup primary db on "$_hos"
-	#su - db2inst1 -c "db2 deactivate database $_dbname"
-	#su - db2inst1 -c "db2 start hadr on database $_dbname as primary"
+	# su - db2inst1 -c "db2 deactivate database $_dbname"
+	# su - db2inst1 -c "db2 start hadr on database $_dbname as primary"
 }
 
 # take over
-takeOver()
-{
+takeOver() {
 	  case "$_rol" in
 		STANDARD)
 			echo "where database instance has been running,please start up hadr database."
@@ -85,7 +79,7 @@ takeOver()
 			;;
 		STANDBY)
 			echo "Ready to take over hadr db on standby."
-			#su - db2inst1 -c "db2 takeover hadr on database $_dbname"
+			# su - db2inst1 -c "db2 takeover hadr on database $_dbname"
 			;;
 		*)
 			echo "Database don't startup."
@@ -95,18 +89,16 @@ takeOver()
 
 
 # stop hadr
-stopHadr()
-{
+stopHadr() {
 	echo "shutdown hadr db on "$_hos"
-	#su - db2inst1 -c "db2 DEACTIVATE DATABASE $_dbname"
-	#su - db2inst1 -c "db2 STOP HADR ON DATABASE $_dbname"
+	# su - db2inst1 -c "db2 DEACTIVATE DATABASE $_dbname"
+	# su - db2inst1 -c "db2 STOP HADR ON DATABASE $_dbname"
 }
 
 
 #ssh connection
-rshConn()
-{
-	#if the connected host is primary host,then need to connect the standby to startup hadr db
+rshConn() {
+	# if the connected host is primary host,then need to connect the standby to startup hadr db
 	if [ "$_hos"="$_pri" ] 
 	then
 		rsh "$_hos" #'su - db2inst1 -c "db2 get db cfg for $_dbname|grep -i hadr"'
@@ -161,9 +153,8 @@ done
 
 
 # usage for script
-usage()
-{
-	 echo "Usage:`basename $0`" 
+usage() {
+   echo "Usage:`basename $0`" 
    echo
    echo "-------------------------------------------------------------------"
    echo
