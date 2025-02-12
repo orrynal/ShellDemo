@@ -1,55 +1,63 @@
 #!/bin/bash
 
-#check hostname.
-#In default,wls1 is primary,wls2 is standby.
+# funcation: used to start or switch hadr server.
+# note: this script can be used in Chinese environment. 
+# If you are in English environment, please modify related Chinese characters 
+
+# check hostname.
+# In default,wls1 is primary,wls2 is standby.
 _pri=wls1
 _std=wls2
 
 _hos=`hostname`
 
-#数据库名
+# 数据库名
 _dbname=sample
 
-#check hadr db role (It's value is one of standard,primary and standby in running,else it is null value)
+# check hadr db role (This value is among three values (standard, primary, standby) in running process, else it is null.)
 _ros=(STANDARD PRIMARY STANDBY " ")
 
-#obtain current hadr role
+# obtain current hadr role
 _rol=`#su - db2inst1 -c "db2 get db cfg for $_dbname |grep -i hadr|grep 数据库角色|awk -F = '{print $2}'|sed -e 's/ //g'"`
 
-#db resource
+# e.g for english env
+# _rol=`#su - db2inst1 -c "db2 get db cfg for $_dbname |grep -i hadr|grep 'database role'|awk -F = '{print $2}'|sed -e 's/ //g'"`
+
+# db resource
 _src="$_dbname-rs:wls"
 
-#db startup and stop status (online offline failed and other)
-#3 kinds of status
+# db startup and stop status (online offline failed and other)
+# 3 kinds of status
 _sts=(Online Offline Failed)
 
-#current status
+# current status
 _sta=`lssam|grep $_src|grep -v grep |awk  '{print $2}'|sed -e 's/ //g'|sort -u`
 
-#status num
+# status num
 _num=`lssam|grep $_src|grep -v grep |awk  '{print $2}'|sed -e 's/ //g'|sort -u|wc -l`
 
+# start db
 startDb()
 {
 	if [ "x$_rol"="x" ]
 	then
-			echo "startup stardard db on "$_hos"
-			#su - db2inst1 -c "db2start"
+		echo "startup stardard db on "$_hos"
+		#su - db2inst1 -c "db2start"
 	fi
 }
 
-
+# stop db
 stopDb()
 {
 	if [ "$_rol"="${_ros[0]}"]
 	then
-			echo "shutdown stardard db on "$_hos"
-			#su - db2inst1 -c "db2stop"
+		echo "shutdown stardard db on "$_hos"
+		#su - db2inst1 -c "db2stop"
 	fi
 
 }
 
-#startup hadr on standby host
+# startup hadr on standby host
 strStandby()
 {
 	echo "startup standy db on "$_hos"
@@ -57,6 +65,7 @@ strStandby()
 	#su - db2inst1 -c "db2 start hadr on database $_dbname as standby"
 }
 
+# start primary
 strPrimary()
 {
 	echo "startup primary db on "$_hos"
@@ -64,27 +73,28 @@ strPrimary()
 	#su - db2inst1 -c "db2 start hadr on database $_dbname as primary"
 }
 
+# take over
 takeOver()
 {
 	  case "$_rol" in
-						STANDARD)
-							echo "where database instance has been running,please start up hadr database."
-							;;
-						PRIMARY)
-							echo "This is the primary database,Please issue the command on standby."
-							;;
-						STANDBY)
-							echo "Ready to take over hadr db on standby."
-							#su - db2inst1 -c "db2 takeover hadr on database $_dbname"
-							;;
-						*)
-							echo "Database don't startup."
-							;;
-		esac
-	
-
+		STANDARD)
+			echo "where database instance has been running,please start up hadr database."
+			;;
+		PRIMARY)
+			echo "This is the primary database,Please issue the command on standby."
+			;;
+		STANDBY)
+			echo "Ready to take over hadr db on standby."
+			#su - db2inst1 -c "db2 takeover hadr on database $_dbname"
+			;;
+		*)
+			echo "Database don't startup."
+			;;
+		esac	
 }
 
+
+# stop hadr
 stopHadr()
 {
 	echo "shutdown hadr db on "$_hos"
@@ -149,6 +159,8 @@ do
 	fi	
 done 
 
+
+# usage for script
 usage()
 {
 	 echo "Usage:`basename $0`" 
@@ -174,6 +186,8 @@ usage()
 
 }
 
+
+# choice
 while :
 do
 echo -n "Enter choice Number [1 2 3 4 5 6 7 or a b c d e f g] : " && read CHOICE
@@ -182,10 +196,7 @@ case $CHOICE in
 			startDb
 			;; 
 		b|2) echo "starting standby database"
-						 
-						 echo "starting primary database"
-						 
-						 
+         	 	echo "starting primary database"
 			;;
 		c|3) echo "taking over hadr db"
 			takeOver
