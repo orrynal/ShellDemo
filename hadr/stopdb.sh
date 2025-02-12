@@ -13,8 +13,7 @@ COMMENT
 
 
 #stop hadr and db on B node
-stopStandby()
-{
+stopStandby() {
 	rsh wls2 'su - db2inst1 -c "db2 DEACTIVATE DATABASE SAMPLE"'
 	rsh wls2 'su - db2inst1 -c "db2 STOP HADR ON DATABASE SAMPLE"'
 	rsh wls2 'su - db2inst1 -c "db2stop"'
