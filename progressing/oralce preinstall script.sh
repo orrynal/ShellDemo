@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#Oracle initial environment script
+# Oracle initial environment script
 _oldhname=`hostname`
 
 _newhname=($1 $2)
@@ -19,9 +19,8 @@ _servicid=$12
 _viphname=(${_newhname[0]}-vip ${_newhname[1]}-vip)
 _prihname=(${_newhname[0]}-priv ${_newhname[0]}-priv)
 
-#set hostname
-setHostname()
-{
+# set hostname
+setHostname() {
 	cd /etc/sysconfig/
 	mv network network_back
 	
@@ -31,12 +30,11 @@ setHostname()
 
 }
 
-setHosts()
-{
+setHosts() {
 for t in pub vip priv scan
 do
 	case $t in
-	        #´Ë´¦µÄÖµÒ²ÎªÊý×é³ÉÔ±ÊýÁ¿,ÈçÉÏÃæÎª3¸ö³ÉÔ±£¬ÄÇÃ´´Ë´¦¾ÍÊÇ0-2(0¡¢1¡¢2)Èý¸öÊý
+	        # æ­¤å¤„çš„å€¼ä¹Ÿä¸ºæ•°ç»„æˆå‘˜æ•°é‡,å¦‚ä¸Šé¢ä¸º3ä¸ªæˆå‘˜ï¼Œé‚£ä¹ˆæ­¤å¤„å°±æ˜¯0-2(0ã€1ã€2)ä¸‰ä¸ªæ•°
 	        pub)
 	        for i in ${_pubhaddr[@]}
 	        do
@@ -75,7 +73,7 @@ do
 }
 
 
-#set users and groups
+# set users and groups
 addGroupUser()
 {
 	groupadd -g 501 oinstall
@@ -89,18 +87,17 @@ addGroupUser()
 	useradd -u 501 -g oinstall -G asmadmin,asmdba,asmoper grid
 	useradd -u 502 -g oinstall -G dba,oper,asmdba oracle
 	
-	#set user password
+	# set user password
 	for u in grid oracle
 	do
-		#set password is "oracle"
+		# set password is "oracle"
 		echo "oracle" |passwd --stdin $u
 	done
 }
 
-#set open file and proc
+# set open file and proc
 
-setLimits()
-{
+setLimits() {
 	cat >>/etc/security/limits.conf <<EOF
 	grid soft nproc  2047
 	grid hard nproc  16384
@@ -116,7 +113,7 @@ setLimits()
 }
 
 
-#32bit or 64bit
+# 32bit or 64bit
 for i in `uname -a|grep -i x86_64`
 do 
 	if [ "$i" = "x86_64" ]
@@ -132,8 +129,7 @@ _sysarch=`cat ._sysarch.log`
 
 echo system is running $_sysarch arch
 
-setSecurityLogin()
-{
+setSecurityLogin() {
 	if [ "$_sysarch" = "x86_64" ]
 	then 
 		echo "system is running in $_sysarch mode"
@@ -151,9 +147,9 @@ setSecurityLogin()
 }
 
 case $_sysarch in
-        #´Ë´¦µÄÖµÒ²ÎªÊý×é³ÉÔ±ÊýÁ¿,ÈçÉÏÃæÎª3¸ö³ÉÔ±£¬ÄÇÃ´´Ë´¦¾ÍÊÇ0-2(0¡¢1¡¢2)Èý¸öÊý
+        # æ­¤å¤„çš„å€¼ä¹Ÿä¸ºæ•°ç»„æˆå‘˜æ•°é‡,å¦‚ä¸Šé¢ä¸º3ä¸ªæˆå‘˜ï¼Œé‚£ä¹ˆæ­¤å¤„å°±æ˜¯0-2(0ã€1ã€2)ä¸‰ä¸ªæ•°
         32|64)
-        printf "     %s" "${_sysarch}Î»ÏµÍ³"
+        printf "     %s" "${_sysarch}ä½ç³»ç»Ÿ"
         printf "\n"
 				writeLogin
         ;;
@@ -165,10 +161,9 @@ esac
 rm -f ._sysarch.log
 
 
-#set profile
+# set profile
 
-setProfile()
-{
+setProfile() {
 	cat >> /etc/profile <<EOF
 	 
 	if[ $USER="oracle" ] || [ $USER="grid" ];then
@@ -185,12 +180,11 @@ setProfile()
  
 }
 
-#set csh
-setCsh()
-{
+# set csh
+setCsh() {
 	cat >> /etc/csh.login <<EOF
 	 
-	if£¨ $USER="oracle" || $USER="grid" )then
+	ifï¼ˆ $USER="oracle" || $USER="grid" )then
 	 limit maxproc 16384
 	 limit descriptors 65536
 	 endif
@@ -199,9 +193,8 @@ setCsh()
 }
 
 
-#set grid profile
-setGridProfile()
-{
+# set grid profile
+setGridProfile() {
 	userdir=`cat /etc/passwd|grep -i grid|awk -F : '{print $6}'`
 	export userdir
 	
@@ -222,9 +215,8 @@ setGridProfile()
 
 }
 
-#set oracle profile
-setOracleProfile()
-{
+# set oracle profile
+setOracleProfile() {
 	userdir=`cat /etc/passwd|grep -i oracle|awk -F : '{print $6}'`
 	export userdir
 	
